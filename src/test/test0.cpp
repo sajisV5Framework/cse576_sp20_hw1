@@ -2,6 +2,7 @@
 #include "../utils.h"
 
 #include <string>
+#include <cassert>
 
 using namespace std;
 
@@ -49,39 +50,82 @@ void test_grayscale()
 
 void test_copy()
   {
-  Image im = load_image("data/dog.jpg");
-  Image c = im;
-  TEST(same_image(im, c));
+	  Image im = load_image("data/dog.jpg");
+	  Image c = im;
+	  TEST(same_image(im, c));
   }
 
 void test_shift()
   {
-  Image im = load_image("data/dog.jpg");
-  Image c = im;
-  shift_image(c, 1, .1);
-  TEST(within_eps(im.data[0], c.data[0]));
-  TEST(within_eps(im.data[im.w*im.h+13] + .1,  c.data[im.w*im.h + 13]));
-  TEST(within_eps(im.data[2*im.w*im.h+72],  c.data[2*im.w*im.h + 72]));
-  TEST(within_eps(im.data[im.w*im.h+47] + .1,  c.data[im.w*im.h + 47]));
+	  Image im = load_image("data/dog.jpg");
+	  Image c = im;
+	  shift_image(c, 1, .1);
+	  TEST(within_eps(im.data[0], c.data[0]));
+	  TEST(within_eps(im.data[im.w*im.h+13] + .1,  c.data[im.w*im.h + 13]));
+	  TEST(within_eps(im.data[2*im.w*im.h+72],  c.data[2*im.w*im.h + 72]));
+	  TEST(within_eps(im.data[im.w*im.h+47] + .1,  c.data[im.w*im.h + 47]));
   }
+
+void test_shift_save()
+{
+	Image im = load_image("data/dog.jpg");
+	Image c = im;
+
+	shift_image(c, 0, .4);
+	shift_image(c, 1, .4);
+	shift_image(c, 2, .4);
+	
+	c.save_image("output/shift_result");
+}
+
+void test_shift_clamp_save()
+{
+	Image im = load_image("data/dog.jpg");
+	Image c = im;
+
+	shift_image(c, 0, .4);
+	shift_image(c, 1, .4);
+	shift_image(c, 2, .4);
+	clamp_image(c);
+	c.save_image("output/clamp_result");
+}
 
 
 
 void test_rgb_to_hsv()
   {
-  Image im = load_image("data/dog.jpg");
-  rgb_to_hsv(im);
-  Image hsv = load_image("data/dog.hsv.png");
-  TEST(same_image(im, hsv));
+	  Image im = load_image("data/dog.jpg");
+	  rgb_to_hsv(im);
+
+	  // MY 
+	  im.save_image("output/rgb_hsb.png");
+
+	  Image hsv = load_image("data/dog.hsv.png");
+	  TEST(same_image(im, hsv));
+	  
   }
+
+void test_color_space_saturation()
+{
+	Image im2 = load_image("data/dog.jpg");
+	rgb_to_hsv(im2);
+	shift_image(im2, 1, .2);
+	clamp_image(im2);
+	hsv_to_rgb(im2);
+	im2.save_image("output/colorspace_result.png");
+}
 
 void test_hsv_to_rgb()
   {
-  Image im = load_image("data/dog.jpg");
-  Image c = im;
-  rgb_to_hsv(im);
-  hsv_to_rgb(im);
-  TEST(same_image(im, c));
+	  Image im = load_image("data/dog.jpg");
+	  Image c = im;
+	  rgb_to_hsv(im);
+	  hsv_to_rgb(im);
+
+	  // MY 
+	  im.save_image("output/hsb_rgb.png");
+
+	  TEST(same_image(im, c));
   }
 
 void test_rgb2lch2rgb()
@@ -97,30 +141,36 @@ void test_rgb2lch2rgb()
 
 void run_tests()
   {
-  test_get_pixel();
-  test_set_pixel();
-  test_copy();
-  test_shift();
-  test_grayscale();
-  test_rgb_to_hsv();
-  test_hsv_to_rgb();
-  test_rgb2lch2rgb();
+	test_get_pixel();
+	test_set_pixel();  
+	test_copy();
+	test_grayscale();
+	test_shift();
+	test_shift_save();
+	test_shift_clamp_save();
+	test_rgb_to_hsv();
+
+	/*	    
+	test_hsv_to_rgb();
+	test_color_space_saturation();
+	test_rgb2lch2rgb();
+	*/
   printf("%d tests, %d passed, %d failed\n", tests_total, tests_total-tests_fail, tests_fail);
   }
 
 int main(int argc, char **argv)
   {
-  // Image manipulation for fun testing.
+	  // Image manipulation for fun testing.
   
-  Image im2 = load_image("data/dog.jpg");
-  for (int i=0; i<im2.w; i++)
-      for (int j=0; j<im2.h; j++)
-          im2(i, j, 0) = 0;
-  im2.save_image("output/pixel_modifying_output");
+	  Image im2 = load_image("data/dog.jpg");
+	  for (int i=0; i<im2.w; i++)
+		  for (int j=0; j<im2.h; j++)
+			  im2(i, j, 0) = 0;
+	  im2.save_image("output/pixel_modifying_output");
   
-  // Running example tests
+	  // Running example tests
   
-  run_tests();
+	  run_tests();
   
-  return 0;
+	  return 0;
   }

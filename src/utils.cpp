@@ -12,18 +12,19 @@ int same_image(const Image& a, const Image& b) { return a==b; }
 
 bool operator ==(const Image& a, const Image& b)
   {
-  if(a.w != b.w || a.h != b.h || a.c != b.c) 
-    {
-    printf("Expected %d x %d x %d image, got %d x %d x %d\n", b.w, b.h, b.c, a.w, a.h, a.c);
-    return 0;
-    }
+	  if(a.w != b.w || a.h != b.h || a.c != b.c) 
+		{
+			printf("Expected %d x %d x %d image, got %d x %d x %d\n", b.w, b.h, b.c, a.w, a.h, a.c);
+			return 0;
+		}
   
-  for(int i = 0; i < a.w*a.h*a.c; ++i) if(!within_eps(a.data[i], b.data[i])) 
-    {
-    printf("The value at %d %d %d should be %f, but it is %f! \n", (i%(a.w*a.h))%a.w, (i%(a.w*a.h))/a.w, i/(a.w*a.h), b.data[i], a.data[i]);
-    return 0;
-    }
-  return 1;
+	  for(int i = 0; i < a.w*a.h*a.c; ++i) 
+		  if(!within_eps(a.data[i], b.data[i])) 
+			{
+				printf("The value at %d %d %d should be %f, but it is %f! \n", (i%(a.w*a.h))%a.w, (i%(a.w*a.h))/a.w, i/(a.w*a.h), b.data[i], a.data[i]);				
+				return 0;
+			}
+	  return 1;
   }
 
 

@@ -42,11 +42,10 @@ struct Image
   
   Image(int w, int h, int c=1) : w(w), h(h), c(c), data(nullptr) 
     {
-    assert(c>=0 && w>=0 && h>=0 && "Invalid image sizes");
+		assert(c>=0 && w>=0 && h>=0 && "Invalid image sizes");
     
-    if(w*h*c)
-      data=(float*)calloc(w*h*c,sizeof(float));
-    
+		if(w*h*c)
+		  data=(float*)calloc(w*h*c,sizeof(float));    
     }
   
   // destructor
@@ -61,81 +60,81 @@ struct Image
   // copy assignment
   Image& operator=(const Image& from)
     {
-    if(this==&from)return *this;
+		if(this==&from)return *this;
     
-    if(data){free(data);data=nullptr;}
-    w=h=c=0;
-    copy_image(*this,from);
-    return *this;
+		if(data){free(data);data=nullptr;}
+		w=h=c=0;
+		copy_image(*this,from);
+		return *this;
     }
   
   // move assignment
   Image& operator=(Image&& from)
     {
-    if(this==&from)return *this;
+		if(this==&from)return *this;
     
-    if(data)free(data);
+		if(data)free(data);
     
-    w=from.w;
-    h=from.h;
-    c=from.c;
-    data=from.data;
+		w=from.w;
+		h=from.h;
+		c=from.c;
+		data=from.data;
     
-    from.data=nullptr;
-    from.w=from.h=from.c=0;
+		from.data=nullptr;
+		from.w=from.h=from.c=0;
     
-    return *this;
+		return *this;
     }
   
   // pixel access
   
   float& operator()(int x, int y, int ch)
     {
-    assert(ch<c && ch>=0 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
-    return data[pixel_address(*this,x,y,ch)];
+		assert(ch<c && ch>=0 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
+		return data[pixel_address(*this,x,y,ch)];
     }
   
   float& operator()(int x, int y)
     {
-    assert(c==1 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
-    return data[pixel_address(*this,x,y,0)];
+		assert(c==1 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
+		return data[pixel_address(*this,x,y,0)];
     }
   
   const float& operator()(int x, int y, int ch) const 
     {
-    //printf("%d %d %d   %d %d %d\n",w,h,c,x,y,ch);
-    assert(ch<c && ch>=0 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
-    return data[pixel_address(*this,x,y,ch)];
+		//printf("%d %d %d   %d %d %d\n",w,h,c,x,y,ch);
+		assert(ch<c && ch>=0 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
+		return data[pixel_address(*this,x,y,ch)];
     }
   
   const float& operator()(int x, int y) const 
     {
-    assert(c==1 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
-    return data[pixel_address(*this,x,y,0)];
+		assert(c==1 && x<w && x>=0 && y<h && y>=0 && "access out of bounds");
+		return data[pixel_address(*this,x,y,0)];
     }
   
-        float& pixel(int x, int y, int ch)       { return operator()(x,y,ch); }
-  const float& pixel(int x, int y, int ch) const { return operator()(x,y,ch); }
-        float& pixel(int x, int y)               { return operator()(x,y); }
-  const float& pixel(int x, int y) const         { return operator()(x,y); }
+   float& pixel(int x, int y, int ch)       { return operator()(x,y,ch); }
+   const float& pixel(int x, int y, int ch) const { return operator()(x,y,ch); }
+   float& pixel(int x, int y)               { return operator()(x,y); }
+   const float& pixel(int x, int y) const         { return operator()(x,y); }
   
   
   float clamped_pixel(int x, int y, int ch) const
     {
-    assert(ch<c && ch>=0);
-    return get_clamped_pixel(*this,x,y,ch);
+		assert(ch<c && ch>=0);
+		return get_clamped_pixel(*this,x,y,ch);
     }
   
   float clamped_pixel(int x, int y) const
     {
-    assert(c==1);
-    return get_clamped_pixel(*this,x,y,0);
+		assert(c==1);
+		return get_clamped_pixel(*this,x,y,0);
     }
   
   void set_pixel(int x, int y, int ch, float v)
     {
-    assert(ch<c && ch>=0);
-    ::set_pixel(*this,x,y,ch,v);
+		assert(ch<c && ch>=0);
+		::set_pixel(*this,x,y,ch,v);
     }
   
   const float* RowPtr(int row, int channel) const { return data+channel*w*h+row*w; }
@@ -145,20 +144,20 @@ struct Image
   
   bool is_empty(int x, int y) const
     {
-    assert(x<w && x>=0 && y<h && y>=0);
-    for(int q1=0;q1<c;q1++)if(pixel(x,y,q1))return false;
-    return true;
+		assert(x<w && x>=0 && y<h && y>=0);
+		for(int q1=0;q1<c;q1++)if(pixel(x,y,q1))return false;
+		return true;
     }
   
   bool is_nonempty_patch(int x, int y, int w=0) const
     {
-    for(int q1=x-w;q1<=x+w;q1++)for(int q2=y-w;q2<=y+w;q2++)
-      {
-      int c1=0;
-      for(int ch=0;ch<c;ch++)if(clamped_pixel(q1,q2,ch))c1++;
-      if(c1==0)return false;
-      }
-    return true;
+		for(int q1=x-w;q1<=x+w;q1++)for(int q2=y-w;q2<=y+w;q2++)
+		  {
+		  int c1=0;
+		  for(int ch=0;ch<c;ch++)if(clamped_pixel(q1,q2,ch))c1++;
+		  if(c1==0)return false;
+		  }
+		return true;
     }
   
   int size(void) const { return w*h*c; }
